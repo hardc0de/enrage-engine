@@ -1,6 +1,6 @@
 #include "Map.h"
 
-Map::Map(int** map, uint width, uint height, std::string* texturePaths, uint textureCount, uint textureSize)
+Map::Map(int** map, uint width, uint height, std::string* texturePaths, uint* animatedTextureFrameCount, uint* animatedTextureDuration, uint textureCount, uint textureSize, uint ceilingTextureIndex, uint floorTextureIndex, uint doorTextureIndex, bool useFog, double fogDistance)
 {
     this -> width = width;
     this -> height = height;
@@ -15,13 +15,27 @@ Map::Map(int** map, uint width, uint height, std::string* texturePaths, uint tex
             this -> map[i][j] = map[i][j];
     }
 
-    this -> textures = new Image*[textureCount];
+    this -> textures = new IImage*[textureCount];
 
     for(uint i = 0; i < textureCount; i++)
-        this -> textures[i] = new Image(texturePaths[i].c_str());
+    {
+        if(animatedTextureFrameCount[i] <= 1)
+            this -> textures[i] = new Image(texturePaths[i].c_str());
+        else
+            this -> textures[i] = new AnimatedImage(texturePaths[i].c_str(), animatedTextureFrameCount[i], animatedTextureDuration[i]);
+    }
 
     this -> textureCount = textureCount;
     this -> textureSize = textureSize;
+
+    this -> ceilingTextureIndex = ceilingTextureIndex;
+    this -> floorTextureIndex = floorTextureIndex;
+    this -> doorTextureIndex = doorTextureIndex;
+
+    this -> useFog = useFog;
+    this -> fogDistance = fogDistance;
+
+    inversefogDistance = 1 / this -> fogDistance;
 }
 
 Map::~Map()
@@ -43,6 +57,12 @@ Map::~Map()
     }
 }
 
+void Map::UpdateMap()
+{
+    for(uint i = 0; i < textureCount; i++)
+        textures[i] -> UpdateImage();
+}
+
 uint Map::GetWidth()
 {
     return width;
@@ -51,6 +71,52 @@ uint Map::GetWidth()
 uint Map::GetHeight()
 {
     return height;
+}
+
+uint Map::GetCeilingTextureIndex()
+{
+    return ceilingTextureIndex;
+}
+
+uint Map::GetFloorTextureIndex()
+{
+    return floorTextureIndex;
+}
+
+uint Map::GetDoorTextureIndex()
+{
+    return doorTextureIndex;
+}
+
+bool Map::UsesFog()
+{
+    return useFog;
+}
+
+void Map::SetUsesFog(bool usesFog)
+{
+    this -> useFog = usesFog;
+}
+
+double Map::GetFogDistance()
+{
+    return fogDistance;
+}
+
+void Map::SetFogDistance(double fogDistance)
+{
+    if(fogDistance < 1)
+        this -> fogDistance = 1;
+    else
+    {
+        this -> fogDistance = fogDistance;
+        this -> inversefogDistance = 1 / fogDistance;
+    }
+}
+
+double Map::GetInverseFogDistance()
+{
+    return inversefogDistance;
 }
 
 int Map::GetTileAtPosition(uint x, uint y)
@@ -66,7 +132,7 @@ uint Map::GetTextureSize()
     return textureSize;
 }
 
-Image* Map::GetTexture(uint index)
+IImage* Map::GetTexture(uint index)
 {
     return textures[index];
 }

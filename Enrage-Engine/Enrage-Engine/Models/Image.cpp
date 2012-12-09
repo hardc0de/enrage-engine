@@ -2,10 +2,19 @@
 
 Image::Image()
 {
-    image = NULL;
-    pixels = NULL;
-    width = 0;
-    height = 0;
+    width = TEXTURE_SIZE;
+    height = TEXTURE_SIZE;
+
+    image = SDL_CreateRGBSurface(SDL_HWSURFACE, width, height, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
+    pixels = (uint*)image -> pixels;
+
+    for(uint i = 0; i < width; i++)
+    {
+        for(uint j = 0; j < height; j++)
+            pixels[j * width + i] = (i ^ j) & 0x000000FF | (((i ^ j) << 8) & 0x0000FF00) | (((i ^ j) << 16) & 0x00FF0000) | 0xFF000000;
+    }
+
+    refCount = 0;
 }
 
 Image::Image(std::string path)
@@ -14,12 +23,28 @@ Image::Image(std::string path)
     SDL_Surface* sourceImage;
 
     if(!tempImage)
-        throw ImageFileNotFound();
+    {
+        width = TEXTURE_SIZE;
+        height = TEXTURE_SIZE;
+
+        image = SDL_CreateRGBSurface(SDL_HWSURFACE, width, height, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
+        pixels = (uint*)image -> pixels;
+
+        for(uint i = 0; i < width; i++)
+        {
+            for(uint j = 0; j < height; j++) // Generate a texture in case the destination one does not exist under given path
+                pixels[j * width + i] = (i ^ j) & 0x000000FF | (((i ^ j) << 8) & 0x0000FF00) | (((i ^ j) << 16) & 0x00FF0000) | 0xFF000000;
+        }
+
+        refCount = 0;
+
+        return;
+    }
 
     if(tempImage -> format -> BitsPerPixel < 32)
     {
         SDL_Surface* x = SDL_CreateRGBSurface(SDL_HWSURFACE, 1, 1, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
-        sourceImage = SDL_ConvertSurface(tempImage, x -> format, SDL_SWSURFACE);
+        sourceImage = SDL_ConvertSurface(tempImage, x -> format, SDL_HWSURFACE);
         SDL_FreeSurface(tempImage);
         SDL_FreeSurface(x);
     }
@@ -51,15 +76,22 @@ Image::Image(std::string path)
     }
 
     SDL_FreeSurface(sourceImage);
+
+    refCount = 0;
 }
 
 Image::~Image()
 {
-    if(image)
-        SDL_FreeSurface(image);
+    if(refCount > 0)
+        refCount--;
+    else
+    {
+        if(image)
+            SDL_FreeSurface(image);
 
-    width = 0;
-    height = 0;
+        width = 0;
+        height = 0;
+    }
 }
 
 uint Image::GetPixel(uint x, uint y)
@@ -76,4 +108,19 @@ uint Image::GetWidth()
 uint Image::GetHeight()
 {
     return height;
+}
+
+uint Image::GetRefCount()
+{
+    return refCount;
+}
+
+void Image::IncrementRefCount()
+{
+    refCount++;
+}
+
+void Image::UpdateImage()
+{
+    // For the sake of AnimatedImage compatibility
 }

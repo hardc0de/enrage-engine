@@ -46,54 +46,56 @@ Player::~Player()
 {
 }
 
-void Player::Move()
+void Player::MoveThink()
 {
-    if(moveForward)
-        MoveForward();
-    if(moveBackwards)
-        MoveBackwards();
+    ChangeAcceleration();
+    Move();
+
     if(rotateLeft)
         RotateLeft();
     if(rotateRight)
         RotateRight();
 }
 
-void Player::MoveForward()
+void Player::Move()
 {
-    if(!CollidesX(1))
-        xPosition += xDirection * speed;
-    if(!CollidesY(1))
-        yPosition += yDirection * speed;
-}
-
-void Player::MoveBackwards()
-{
-    if(!CollidesX(-1))
-        xPosition -= xDirection * speed;
-    if(!CollidesY(-1))
-        yPosition -= yDirection * speed;
+    if(!CollidesX(Signum(acceleration)))
+        xPosition += xDirection * speed * acceleration;
+    if(!CollidesY(Signum(acceleration)))
+        yPosition += yDirection * speed * acceleration;
 }
 
 void Player::RotateLeft()
 {
     double oldxDirectionVector = xDirection;
-    xDirection = xDirection * cos(speed / 5) - yDirection * sin(speed / 5);
-    yDirection = oldxDirectionVector * sin(speed / 5) + yDirection * cos(speed / 5);
+    xDirection = xDirection * cos(speed / 2.5) - yDirection * sin(speed / 2.5);
+    yDirection = oldxDirectionVector * sin(speed / 2.5) + yDirection * cos(speed / 2.5);
         
     double oldxPlaneVector = xPlane;
-    xPlane = xPlane * cos(speed / 5) - yPlane * sin(speed / 5);
-    yPlane = oldxPlaneVector * sin(speed / 5) + yPlane * cos(speed / 5);
+    xPlane = xPlane * cos(speed / 2.5) - yPlane * sin(speed / 2.5);
+    yPlane = oldxPlaneVector * sin(speed / 2.5) + yPlane * cos(speed / 2.5);
 }
 
 void Player::RotateRight()
 {
     double oldxDirectionVector = xDirection;
-    xDirection = xDirection * cos(-speed / 5) - yDirection * sin(-speed / 5);
-    yDirection = oldxDirectionVector * sin(-speed / 5) + yDirection * cos(-speed / 5);
+    xDirection = xDirection * cos(-speed / 2.5) - yDirection * sin(-speed / 2.5);
+    yDirection = oldxDirectionVector * sin(-speed / 2.5) + yDirection * cos(-speed / 2.5);
         
     double oldxPlaneVector = xPlane;
-    xPlane = xPlane * cos(-speed / 5) - yPlane * sin(-speed / 5);
-    yPlane = oldxPlaneVector * sin(-speed / 5) + yPlane * cos(-speed / 5);
+    xPlane = xPlane * cos(-speed / 2.5) - yPlane * sin(-speed / 2.5);
+    yPlane = oldxPlaneVector * sin(-speed / 2.5) + yPlane * cos(-speed / 2.5);
+}
+
+void Player::Rotate(double angle)
+{
+    double oldxDirectionVector = xDirection;
+    xDirection = xDirection * cos(angle) - yDirection * sin(angle);
+    yDirection = oldxDirectionVector * sin(angle) + yDirection * cos(angle);
+        
+    double oldxPlaneVector = xPlane;
+    xPlane = xPlane * cos(angle) - yPlane * sin(angle);
+    yPlane = oldxPlaneVector * sin(angle) + yPlane * cos(angle);
 }
 
 bool Player::CollidesX(int direction)
@@ -190,6 +192,42 @@ double Player::GetSpeed()
 void Player::SetSpeed(double speed)
 {
     this -> speed = speed;
+}
+
+double Player::GetCurrentSpeed()
+{
+    return currentSpeed;
+}
+
+void Player::SetCurrentSpeed(double currentSpeed)
+{
+    this -> currentSpeed = currentSpeed;
+}
+
+double Player::GetAcceleration()
+{
+    return acceleration;
+}
+
+void Player::SetAcceleration(double acceleration)
+{
+    this -> acceleration = acceleration;
+}
+
+void Player::ChangeAcceleration()
+{
+    if((moveForward) && acceleration <= 1.0)
+        acceleration += 0.1;
+    else if((moveBackwards) && acceleration >= -1.0)
+        acceleration -= 0.1;
+    else if(acceleration > 0.0)
+        acceleration -= 0.1;
+    else if(acceleration < 0.0)
+        acceleration += 0.1;
+    if(acceleration < 0.1 && acceleration > 0)
+        acceleration = 0;
+    if(acceleration > -0.1 && acceleration < 0)
+        acceleration = 0;
 }
 
 bool Player::GetMoveForward()

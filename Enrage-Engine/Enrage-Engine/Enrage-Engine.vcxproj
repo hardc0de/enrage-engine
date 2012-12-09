@@ -53,7 +53,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL.lib;SDLmain.lib;SDL_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL.lib;SDLmain.lib;SDL_image.lib;SDL_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>
@@ -69,27 +69,34 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>SDL.lib;SDLmain.lib;SDL_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL.lib;SDLmain.lib;SDL_image.lib;SDL_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Constants\Definitions.h" />
+    <ClInclude Include="Models\AnimatedImage.h" />
     <ClInclude Include="Models\Display.h" />
     <ClInclude Include="Models\Game.h" />
+    <ClInclude Include="Models\IImage.h" />
     <ClInclude Include="Models\Image.h" />
     <ClInclude Include="Models\Map.h" />
+    <ClInclude Include="Models\ObjectManager.h" />
     <ClInclude Include="Models\Player.h" />
     <ClInclude Include="Models\Renderer.h" />
+    <ClInclude Include="Models\Sprite.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Models\AnimatedImage.cpp" />
     <ClCompile Include="Models\Display.cpp" />
     <ClCompile Include="Models\Game.cpp" />
     <ClCompile Include="Models\Image.cpp" />
     <ClCompile Include="Models\Map.cpp" />
+    <ClCompile Include="Models\ObjectManager.cpp" />
     <ClCompile Include="Models\Player.cpp" />
     <ClCompile Include="Models\Renderer.cpp" />
+    <ClCompile Include="Models\Sprite.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

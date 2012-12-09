@@ -21,6 +21,8 @@ private:
     double yPlane;
 
     double speed;
+    double currentSpeed;
+    double acceleration;
 
     bool moveForward;
     bool moveBackwards;
@@ -32,13 +34,14 @@ public:
     Player(Map* map, double xPosition, double yPosition, double xDirection, double yDirection, double xPlane, double yPlane, double speed);
     ~Player();
 
-    void Move();
+    void MoveThink();
 
-    void MoveForward();
-    void MoveBackwards();
+    void Move();
 
     void RotateLeft();
     void RotateRight();
+
+    void Rotate(double angle);
 
     void Shoot();
 
@@ -67,6 +70,14 @@ public:
 
     double GetSpeed();
     void SetSpeed(double speed);
+
+    double GetCurrentSpeed();
+    void SetCurrentSpeed(double currentSpeed);
+
+    double GetAcceleration();
+    void SetAcceleration(double acceleration);
+
+    void ChangeAcceleration();
 
     bool GetMoveForward();
     void SetMoveForward(bool moveForward);
